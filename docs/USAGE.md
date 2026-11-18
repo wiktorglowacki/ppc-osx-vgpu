@@ -130,7 +130,7 @@ Defaults you can set once in your shell profile instead of on every run:
 | `PPCOSX_PKG` | macOS: `brew` or `macports`, the package manager `setup` uses (default: Homebrew on Apple Silicon, MacPorts on Intel, whichever is installed). |
 
 For the installer (`install.sh`): `PPCOSX_HOME` (where to install,
-default `~/.ppcosx`), `PPCOSX_BRANCH` (default `main`) and `PPCOSX_REPO`
+default `~/.ppcosx`), `PPCOSX_BRANCH` (default `release/morphos-radeon`) and `PPCOSX_REPO`
 (install from a fork). For Linux setup: `PPCOSX_RELEASES` (the GitHub
 `owner/repo` to download the prebuilt QEMU from) and
 `PPCOSX_QEMU_TARBALL` (use a local prebuilt tarball instead of

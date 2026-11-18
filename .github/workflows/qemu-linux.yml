@@ -5,18 +5,22 @@ name: Linux QEMU
 
 on:
   push:
-    branches: [main, morphos-radeon]
+    branches: [release/morphos-radeon]
     paths:
       - qemu
+      - ppcosx
+      - install.sh
+      - licenses/**
       - tools/build-linux-qemu.sh
       - .github/workflows/qemu-linux.yml
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/release/morphos-radeon'
     strategy:
       fail-fast: false
       matrix:
@@ -55,16 +59,46 @@ jobs:
           ppcosx-qemu/bin/qemu-system-ppc -device help | grep -q ati-radeon-9700
           ppcosx-qemu/bin/qemu-system-ppc -display help | grep -Eq '^[[:space:]]*sdl([[:space:]]|$)'
           (cd ppcosx-qemu && sha256sum -c SHA256SUMS)
+          cmp licenses/SPIRV-Cross-copyright ppcosx-qemu/licenses/SPIRV-Cross-copyright
+          cmp licenses/Apache-2.0.txt ppcosx-qemu/licenses/Apache-2.0.txt
 
-      - name: Publish
+      - uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
+        with:
+          name: ppcosx-qemu-linux-${{ matrix.arch }}
+          path: ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/release/morphos-radeon'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    concurrency: publish-linux-qemu
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ppcosx-qemu-linux-*
+          merge-multiple: true
+      - name: Publish both architectures at the build commit
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="qemu-$(git rev-parse HEAD:qemu | cut -c1-12)"
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            if [ "$(git rev-parse "refs/tags/$tag^{commit}")" != "$GITHUB_SHA" ]; then
+              echo "$tag already points to a different bundle commit" >&2
+              exit 1
+            fi
+          else
+            git push origin "$GITHUB_SHA:refs/tags/$tag"
+          fi
           gh release view "$tag" >/dev/null 2>&1 ||
-            gh release create "$tag" --latest=false \
+            gh release create "$tag" --verify-tag --latest=false \
               --title "Prebuilt QEMU for Linux ($tag)" \
-              --notes "qemu-system-ppc and qemu-img for ppcosx on Linux (Ubuntu 24.04 or newer, x86_64 and arm64), built from the pinned qemu/ commit. ppcosx setup downloads these; you don't need to." ||
-            true
-          gh release upload "$tag" "ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz" --clobber
+              --notes "qemu-system-ppc and qemu-img for ppcosx on Linux (Ubuntu 24.04 or newer, x86_64 and arm64), built from the pinned qemu/ commit."
+          gh release upload "$tag" ppcosx-qemu-linux-{x86_64,aarch64}.tar.xz --clobber

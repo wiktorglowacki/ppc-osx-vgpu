@@ -7,7 +7,7 @@
 # `ppcosx` command on your PATH.  Re-running it updates an existing install.
 #
 #   PPCOSX_HOME=/some/dir   install somewhere else (default ~/.ppcosx)
-#   PPCOSX_BRANCH=name      install another branch (default morphos-radeon)
+#   PPCOSX_BRANCH=name      install another branch (default release/morphos-radeon)
 #   PPCOSX_REPO=url         install from a fork
 #
 # Everything is inside main(), which runs on the last line: under
@@ -18,7 +18,7 @@ main() {
     set -u
     local repo_url="${PPCOSX_REPO:-https://github.com/wiktorglowacki/ppc-osx-vgpu.git}"
     local dir="${PPCOSX_HOME:-$HOME/.ppcosx}"
-    local branch="${PPCOSX_BRANCH:-morphos-radeon}"
+    local branch="${PPCOSX_BRANCH:-release/morphos-radeon}"
     local B= R= G= Y= N=
     if [ -t 2 ]; then
         B=$'\033[1m'; R=$'\033[31m'; G=$'\033[32m'; Y=$'\033[33m'; N=$'\033[0m'

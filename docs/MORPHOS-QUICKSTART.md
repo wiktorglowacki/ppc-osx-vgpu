@@ -2,7 +2,7 @@
 
 This experimental path uses mac99, a G4 CPU, Radeon 9700, 256 MB VRAM and `Vulkan`. Use your own MorphOS ISO and disks. The upstream `ppcosx` installer below the README's MorphOS section installs the Mac OS X project; it does not select this fork.
 
-From a checkout of this branch, initialize its pinned QEMU source and build
+From a checkout of `release/morphos-radeon`, initialize its pinned QEMU source and build
 on a host with SDL/OpenGL and a working Vulkan driver.
 
 ```sh
