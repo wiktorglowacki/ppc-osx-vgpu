@@ -506,10 +506,10 @@ setup_build() {
 
     say "Building QEMU (qemu-system-ppc only; this takes a few minutes)"
     mkdir -p "$QEMU_BUILD"
-    if [ ! -f "$QEMU_BUILD/build.ninja" ]; then
+    if [ ! -f "$QEMU_BUILD/build.ninja" ] || [ ! -x "$QEMU_BUILD/qemu-system-ppc" ]; then
         (cd "$QEMU_BUILD" && ../configure --python="$venv/bin/python3" \
             --target-list=ppc-softmmu --disable-docs "${display_flags[@]}" \
-            --disable-werror -Doptimization=2) \
+            --disable-werror -Ddtc:werror=false -Doptimization=2) \
             > "$QEMU_BUILD/ppcosx-configure.log" 2>&1 \
             || { tail -30 "$QEMU_BUILD/ppcosx-configure.log"
                  die "configure failed; full log: qemu/build/ppcosx-configure.log"; }
