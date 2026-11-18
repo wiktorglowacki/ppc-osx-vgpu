@@ -9,7 +9,7 @@ firmware/               OpenBIOS, ndrvloader, NDRV (+ sources/patchers in src/)
   radeon/               firmware for the Radeon mode
   vga/                  stock UTM firmware for installing and --vga
   SHA1SUMS              checked by ppcosx doctor
-qemu/                   git submodule: the QEMU fork (branch r300)
+qemu/                   git submodule: the QEMU fork (development branch morphos-radeon)
   hw/display/ppc_mac_gpu.c        the device: PCI, MMIO, CP/PM4, GART, 2D, scanout
   hw/display/ppc_mac_gpu_metal.m  Metal backend
   hw/display/ppc_mac_gpu_vulkan.c Vulkan backend (MoltenVK on macOS)
@@ -20,7 +20,7 @@ qemu/                   git submodule: the QEMU fork (branch r300)
   tests/r300/                     offline R300 tests (run.sh)
   tests/ppc-vmx/                  bare-metal AltiVec correctness + speed test (run.py)
 tools/vmctl.py          drive a running VM: keys, clicks, screenshots, HMP
-tools/build-linux-qemu.sh  build the prebuilt Linux QEMU tarball
+tools/build-linux-qemu.sh  build qemu/build (O3, LTO, PGO) or the prebuilt Linux tarball
 .github/workflows/      CI: builds that tarball for each pinned qemu/ commit
 docs/                   these documents
 vm/                     your disks, ROM and logs (git-ignored)
@@ -32,6 +32,15 @@ device model (`ppc-mac-gpu` without `r300`, the Radeon 9200 path, still
 built and sharing most of `ppc_mac_gpu.c`), `hw/display/poweremu-gpu.c` (a
 paravirtual GPU for a cooperating guest driver) and the "harmony"
 window tracking (`ui/poweremu-display.c`, `PPCGPU_WINDOWS`).
+
+## Local PGO training
+
+The Linux and macOS build scripts reuse an existing profile. To train a new
+one, supply `vm/morphos/morphos-one.img` and create `.buildenv/pgo-workloads`
+with one duration in seconds and one MorphOS Shell command per line. For
+example, `60 Execute Work:Bench/draw` runs a script you installed on that
+image. Use the same file and guest image when comparing profiles. Training
+boots a disk clone for each command. The portable build takes no PGO inputs.
 
 ## Rebuilding
 
@@ -53,21 +62,21 @@ one it was.
 
 ## Updating the QEMU fork
 
-`qemu/` is a submodule tracking the `r300` branch of the fork:
+`qemu/` pins an exact commit; `morphos-radeon` is the fork's development branch:
 
 ```bash
 cd qemu
-git fetch origin r300 && git checkout -B r300 FETCH_HEAD   # once
-<commit your changes> && git push origin r300
+git fetch origin morphos-radeon && git checkout -B morphos-radeon FETCH_HEAD   # once
+<commit your changes> && git push origin morphos-radeon
 cd .. && git add qemu && git commit -m "qemu: bump"      # pin the new commit
 ```
 
 The fetch is needed because `setup` clones `qemu/` shallow at the pinned
 commit, which only tracks the fork's default branch (`poweremu`), not
-`r300`.
+`morphos-radeon`.
 
 `origin` here is the URL in `.gitmodules`
-(`linuxkid473/poweremu-qemu`). If your checkout's `origin` is the
+(`wiktorglowacki/poweremu-qemu`). If your checkout's `origin` is the
 upstream `Spartan0285/poweremu-qemu` instead, add the fork as another
 remote and push there; pushing upstream is refused.
 

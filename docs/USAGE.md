@@ -63,6 +63,12 @@ ppcosx run -- -serial stdio                 # extra QEMU flags
 * In the Radeon mode the pointer is an absolute USB tablet plus a
   hardware cursor drawn by the emulated card (not with `--jaguar`:
   see below).
+* Mouse-look games (RTCW, Quake 3, reVC) need relative motion, which a
+  tablet cannot give. On the Mac the window switches to the machine's
+  relative USB mouse by itself while the guest hides its pointer, and back
+  to the tablet when the pointer shows; the window title says which is
+  active. **Ctrl+Option+M** switches by hand and holds that until the
+  pointer next shows. `QEMU_COCOA_AUTO_GAME_MOUSE=0` leaves only the key.
 * On Linux the window is GTK (zoomed to fit), sound goes to PulseAudio
   (or PipeWire's PulseAudio server), and **Ctrl+Alt+G** releases the mouse.
 

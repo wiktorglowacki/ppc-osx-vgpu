@@ -5,7 +5,7 @@ name: Linux QEMU
 
 on:
   push:
-    branches: [main]
+    branches: [main, morphos-radeon]
     paths:
       - qemu
       - tools/build-linux-qemu.sh
@@ -36,7 +36,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential ninja-build pkg-config python3 \
             python3-venv flex bison libglib2.0-dev libpixman-1-dev libslirp-dev \
-            libgtk-3-dev libpulse-dev libvulkan-dev libshaderc-dev \
+            libgtk-3-dev libsdl2-dev libepoxy-dev libpulse-dev libvulkan-dev libshaderc-dev \
             libspirv-cross-c-shared-dev
 
       - name: Build
@@ -46,8 +46,11 @@ jobs:
         run: |
           tar -xJf "ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz"
           ppcosx-qemu/bin/qemu-system-ppc -device help | grep -q ati-radeon-9700
+          ppcosx-qemu/bin/qemu-system-ppc -display help | grep -Eq '^[[:space:]]*sdl([[:space:]]|$)'
+          (cd ppcosx-qemu && sha256sum -c SHA256SUMS)
 
       - name: Publish
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

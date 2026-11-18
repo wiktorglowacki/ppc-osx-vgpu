@@ -1,13 +1,13 @@
 #!/bin/bash
-# One-line installer for ppcosxkvm:
+# Fork installer for the inherited ppcosx command (MorphOS: docs/MORPHOS-QUICKSTART.md):
 #
-#   curl -fsSL https://raw.githubusercontent.com/linuxkid473/ppcosxkvm/main/install.sh | bash
+#   bash install.sh
 #
 # Clones (or updates) the project into ~/.ppcosx, builds QEMU, and puts the
 # `ppcosx` command on your PATH.  Re-running it updates an existing install.
 #
 #   PPCOSX_HOME=/some/dir   install somewhere else (default ~/.ppcosx)
-#   PPCOSX_BRANCH=name      install another branch (default main)
+#   PPCOSX_BRANCH=name      install another branch (default morphos-radeon)
 #   PPCOSX_REPO=url         install from a fork
 #
 # Everything is inside main(), which runs on the last line: under
@@ -16,9 +16,9 @@
 
 main() {
     set -u
-    local repo_url="${PPCOSX_REPO:-https://github.com/linuxkid473/ppcosxkvm.git}"
+    local repo_url="${PPCOSX_REPO:-https://github.com/wiktorglowacki/ppc-osx-vgpu.git}"
     local dir="${PPCOSX_HOME:-$HOME/.ppcosx}"
-    local branch="${PPCOSX_BRANCH:-main}"
+    local branch="${PPCOSX_BRANCH:-morphos-radeon}"
     local B= R= G= Y= N=
     if [ -t 2 ]; then
         B=$'\033[1m'; R=$'\033[31m'; G=$'\033[32m'; Y=$'\033[33m'; N=$'\033[0m'
@@ -87,6 +87,11 @@ then open a new terminal window and run this one-liner again."
     esac
 
     if [ -d "$dir/.git" ]; then
+        local installed_repo installed_branch
+        installed_repo=$(git -C "$dir" remote get-url origin) || fail "Cannot read the existing checkout's origin; choose a fresh PPCOSX_HOME."
+        installed_branch=$(git -C "$dir" symbolic-ref --short HEAD) || fail "The existing checkout is detached; choose a fresh PPCOSX_HOME."
+        [ "$installed_repo" = "$repo_url" ] && [ "$installed_branch" = "$branch" ] ||
+            fail "The existing checkout uses another origin or branch; choose a fresh PPCOSX_HOME for this fork."
         say "Updating the existing install in $dir"
         git -C "$dir" pull --ff-only </dev/null \
             || fail "git pull failed in $dir (did you change files there?)"
@@ -119,7 +124,7 @@ Then boot it:
 
 If 'ppcosx' isn't found, open a new terminal window first.
 Update later with:  ppcosx update
-Guide: https://github.com/linuxkid473/ppcosxkvm/blob/main/docs/GETTING-STARTED.md
+MorphOS guide: $dir/docs/MORPHOS-QUICKSTART.md
 EOF
 }
 

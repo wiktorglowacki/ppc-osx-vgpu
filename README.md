@@ -1,4 +1,10 @@
-# ppcosxkvm
+# MorphOS Radeon 9700 fork
+
+This branch contains experimental MorphOS support for mac99 and the emulated Radeon 9700. Start with [MorphOS setup](docs/MORPHOS-QUICKSTART.md), including the user-supplied ISO and checked 2018 firmware. Public source reachability and a clean portable build remain [release prerequisites](docs/RELEASING.md); firmware is supplied separately and optional guest content is excluded from the initial artifacts.
+
+The Mac OS X instructions below are inherited upstream documentation. Their installer URLs select the upstream project, not this MorphOS fork.
+
+## Upstream Mac OS X project
 
 **Run Mac OS X Tiger (the PowerPC version) on your Apple Silicon Mac or
 Linux PC, with working 3D graphics.**

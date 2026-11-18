@@ -60,18 +60,18 @@ PORT_DEPS="ninja pkgconfig glib2 libpixman libslirp shaderc spirv-cross glslang 
 # loader and a driver, and the shader toolchain (shaderc, SPIRV-Cross).
 # What a prebuilt QEMU needs at run time (Ubuntu 24.04 / Debian 13 names).
 APT_RUNTIME_DEPS="git curl ca-certificates xz-utils python3 libglib2.0-0t64
-    libpixman-1-0 libslirp0 libgtk-3-0t64 libpulse0 libvulkan1
+    libpixman-1-0 libslirp0 libgtk-3-0t64 libsdl2-2.0-0 libepoxy0 libpulse0 libvulkan1
     mesa-vulkan-drivers libshaderc1 libspirv-cross-c-shared0"
 APT_DEPS="build-essential git ninja-build pkg-config python3 python3-venv flex bison
-    libglib2.0-dev libpixman-1-dev libslirp-dev libgtk-3-dev libpulse-dev
+    libglib2.0-dev libpixman-1-dev libslirp-dev libgtk-3-dev libsdl2-dev libepoxy-dev libpulse-dev
     libvulkan-dev mesa-vulkan-drivers libshaderc-dev libspirv-cross-c-shared-dev
     glslang-tools spirv-tools"
 DNF_DEPS="gcc gcc-c++ make git ninja-build pkgconf-pkg-config python3 flex bison
-    glib2-devel pixman-devel libslirp-devel gtk3-devel pulseaudio-libs-devel
+    glib2-devel pixman-devel libslirp-devel gtk3-devel SDL2-devel libepoxy-devel pulseaudio-libs-devel
     vulkan-loader-devel vulkan-headers mesa-vulkan-drivers libshaderc-devel
     spirv-cross-devel glslang spirv-tools"
 PACMAN_DEPS="base-devel git ninja pkgconf python flex bison glib2 pixman libslirp
-    gtk3 libpulse vulkan-icd-loader vulkan-headers shaderc spirv-cross glslang
+    gtk3 sdl2 libepoxy libpulse vulkan-icd-loader vulkan-headers shaderc spirv-cross glslang
     spirv-tools"
 HOST_OS=$(uname -s)
 [ "$HOST_OS" = Darwin ] && IS_MAC=1 || IS_MAC=0
@@ -259,7 +259,7 @@ ${B}Run options${N} (for "ppcosx", "ppcosx run" and "ppcosx install")
   -- ARGS...       pass the remaining arguments straight to QEMU
 
 Files live in $VM_DIR (override with PPCOSX_VM_DIR).
-Program: $REPO   Docs: https://github.com/linuxkid473/ppcosxkvm/tree/main/docs
+Program: $REPO   Docs: $REPO/docs/MORPHOS-QUICKSTART.md
 EOF
     if [ "$PROG" != ppcosx ]; then
         printf '\n%sppcosx is not on your PATH yet: type %s instead, or run "%s link".%s\n' "$Y" "$PROG" "$PROG" "$N"
@@ -346,7 +346,8 @@ setup_linux_prebuilt() {
     esac
     sha=$(git -C "$REPO" rev-parse HEAD:qemu 2>/dev/null) || return 1
     if [ -f "$PREBUILT_DIR/VERSION" ] && [ "$(cat "$PREBUILT_DIR/VERSION")" = "$sha" ] &&
-       [ -x "$PREBUILT_DIR/bin/qemu-system-ppc" ]; then
+       [ -x "$PREBUILT_DIR/bin/qemu-system-ppc" ] &&
+       (cd "$PREBUILT_DIR" && sha256sum -c SHA256SUMS >/dev/null 2>&1); then
         ok "prebuilt QEMU (${sha:0:12}) already here"
         setup_vulkan_check
         return 0
@@ -374,6 +375,13 @@ setup_linux_prebuilt() {
     fi
     if ! tar -C "$tmp" -xJf "$tmp/q.tar.xz" || [ ! -x "$tmp/ppcosx-qemu/bin/qemu-system-ppc" ]; then
         warn "the prebuilt QEMU download is damaged; building QEMU instead"
+        rm -rf "$tmp"
+        return 1
+    fi
+    if [ ! -f "$tmp/ppcosx-qemu/VERSION" ] ||
+       [ "$(cat "$tmp/ppcosx-qemu/VERSION")" != "$sha" ] ||
+       ! (cd "$tmp/ppcosx-qemu" && sha256sum -c SHA256SUMS >/dev/null 2>&1); then
+        warn "the prebuilt QEMU source pin or checksums do not match; building QEMU instead"
         rm -rf "$tmp"
         return 1
     fi
@@ -464,6 +472,8 @@ setup_mac() {
 
 setup_build() {
     local jobs
+    local display_flags=(--disable-sdl)
+    [ "$HOST_OS" = Linux ] && display_flags=(--enable-sdl --enable-opengl)
     say "Fetching the QEMU source"
     if [ -d "$REPO/.git" ]; then
         git -C "$REPO" submodule update --init --depth 1 qemu \
@@ -498,7 +508,7 @@ setup_build() {
     mkdir -p "$QEMU_BUILD"
     if [ ! -f "$QEMU_BUILD/build.ninja" ]; then
         (cd "$QEMU_BUILD" && ../configure --python="$venv/bin/python3" \
-            --target-list=ppc-softmmu --disable-docs --disable-sdl \
+            --target-list=ppc-softmmu --disable-docs "${display_flags[@]}" \
             --disable-werror -Doptimization=2) \
             > "$QEMU_BUILD/ppcosx-configure.log" 2>&1 \
             || { tail -30 "$QEMU_BUILD/ppcosx-configure.log"

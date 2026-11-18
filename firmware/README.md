@@ -1,8 +1,12 @@
 # Firmware
 
-Everything in this folder is free software and may be redistributed. Nothing
-here comes from Apple or ATI. `SHA1SUMS` lists the expected checksums, and
-`./ppcosx doctor` verifies them.
+This table records the inherited firmware binaries and their stated origins. Checksums identify the files; they do not establish the exact corresponding source, build recipes or complete notices. Resolve those records before including these binaries in a public release.
+
+MorphOS uses a separate 2018 OpenBIOS file selected with `MORPHOS_FIRMWARE`;
+the UTM files below are not substitutes for its checked patch offsets. See
+[MorphOS setup](../docs/MORPHOS-QUICKSTART.md) for the required SHA-256 and inputs.
+Verified primary download/source records and the initial archive exclusions are
+documented in [PROVENANCE.md](PROVENANCE.md).
 
 | File | What it is | Origin | License |
 |---|---|---|---|

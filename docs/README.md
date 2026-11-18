@@ -7,3 +7,4 @@
 5. [How it works](HOW-IT-WORKS.md): the emulated Radeon, the Metal/Vulkan translation, the command-processor thread, AltiVec on NEON
 6. [Developing](DEVELOPING.md): layout, rebuilding, the Linux prebuilt QEMU, debug switches, profiling, tests
 7. [Firmware provenance and licences](../firmware/README.md)
+8. [MorphOS experiment](MORPHOS.md): ISO-only Radeon 9700 launcher, checks, and current compatibility gaps

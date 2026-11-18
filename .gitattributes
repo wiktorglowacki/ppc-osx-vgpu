@@ -1,0 +1,7 @@
+# Initial source archives omit optional, separately supplied binary/guest inputs.
+/vm export-ignore
+/firmware/vga export-ignore
+/firmware/radeon export-ignore
+/firmware/jaguar export-ignore
+/firmware/src/ndrv/qemu_vga.orig.ndrv export-ignore
+/firmware/SHA1SUMS export-ignore
