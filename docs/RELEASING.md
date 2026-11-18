@@ -22,3 +22,5 @@ git -C "$CHECKOUT" -c protocol.file.allow=always \
     -c submodule.qemu.url="$LOCAL_QEMU_MIRROR" \
     submodule update --init --recursive
 ```
+
+On a self-hosted Gitea instance, set the repository Actions variable `LINUX_X86_64_RUNNER` to the Ubuntu 24.04 x86_64 runner label. Push checks can record an HTTP source URL on that instance. Published archives require HTTPS source URLs.

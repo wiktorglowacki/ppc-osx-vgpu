@@ -88,10 +88,18 @@ for tree in "$repo" "$qemu"; do
 done
 source_url=${PPCOSX_SOURCE_URL:-$(git -C "$qemu" remote get-url origin)}
 bundle_source_url=${PPCOSX_BUNDLE_SOURCE_URL:-$(git -C "$repo" remote get-url origin)}
+ci_origin=${GITHUB_SERVER_URL:-}
 for url in "$source_url" "$bundle_source_url"; do
     case "$url" in
-        https://*'@'*|https://*'?'*|https://*'#'*) echo "Source URL must be a public HTTPS repository without credentials, query or fragment." >&2; exit 1 ;;
+        *'@'*|*'?'*|*'#'*) echo "Source URLs must omit credentials, query and fragment." >&2; exit 1 ;;
         https://*) ;;
+        http://*)
+            # An internal Gitea push verifies a temporary archive using its actual origin.
+            if [[ ${GITEA_ACTIONS:-} != true || ${GITHUB_EVENT_NAME:-} != push ||
+                  $url != "${ci_origin%/}/"* ]]; then
+                echo "HTTP source URLs are allowed only for push checks on the same Gitea instance." >&2
+                exit 1
+            fi ;;
         *) echo "Set PPCOSX_SOURCE_URL and PPCOSX_BUNDLE_SOURCE_URL to the published HTTPS source repositories before packaging." >&2; exit 1 ;;
     esac
 done

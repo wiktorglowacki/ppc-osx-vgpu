@@ -21,7 +21,7 @@ permissions:
 jobs:
   build:
     if: github.ref == 'refs/heads/release/morphos-radeon'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.LINUX_X86_64_RUNNER || 'ubuntu-24.04' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,7 +64,7 @@ jobs:
   publish:
     needs: build
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/release/morphos-radeon'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ vars.LINUX_X86_64_RUNNER || 'ubuntu-24.04' }}
     permissions:
       contents: write
     concurrency: publish-linux-qemu

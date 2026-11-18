@@ -1,4 +1,4 @@
 [submodule "qemu"]
 	path = qemu
 	url = ../poweremu-qemu.git
-	branch = morphos-radeon
+	branch = release/morphos-radeon
