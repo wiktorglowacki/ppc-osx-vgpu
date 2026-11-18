@@ -26,3 +26,6 @@ __pycache__/
 /.mimosa/
 /.playwright-mcp/
 /build/
+
+/firmware/*/openbios-ppc
+/firmware/*/ppc-ndrvloader

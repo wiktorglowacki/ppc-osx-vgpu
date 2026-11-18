@@ -1,6 +1,6 @@
 # Firmware inputs and initial package contents
 
-The portable Linux artifact contains QEMU, qemu-img, keymaps, license notices, exact source references, its build recipe and checksums. It contains no firmware, operating system, guest disk or optional application. The bundle's source archives also omit inherited firmware binaries and the optional vm tree through export-ignore rules; a full Git clone and its history still contain those inherited files.
+The portable Linux artifact contains QEMU, qemu-img, keymaps, license notices, exact source references, its build recipe and checksums. It contains no firmware, operating system, guest disk or optional application. The public bundle and QEMU histories exclude the UTM PowerPC OpenBIOS images and classicvirtio loader. Bundle source archives also omit the separate NDRV binaries and optional vm tree.
 
 ## MorphOS 2018 OpenBIOS
 
@@ -47,4 +47,8 @@ python3 firmware/src/ndrv/build.py /path/to/qemu_vga.ndrv /path/to/qemu_vga_hwc.
 
 The inherited patched file has SHA-256 `b817675d45268624d2f075fd76c71abd0381a2ec49b771c3e08b1e1e25c88b80`. Regenerating it from the pinned base with the bundled patcher reproduced this hash. Set `MORPHOS_NDRV` to your supplied file when using a firmware-free archive. A full clone retains the inherited default.
 
-The UTM-derived images and ppc-ndrvloader remain outside the initial artifacts until their exact source revisions/build records are qualified.
+## UTM 4.7.5 and classicvirtio
+
+The [UTM QEMU commit](https://github.com/utmapp/qemu/commit/39858ec7347616d5f513f72185873fa2e352d7de) contains the VGA image shipped in [UTM 4.7.5](https://github.com/utmapp/UTM/releases/tag/v4.7.5). A build of the [Screamer source candidate](https://github.com/mcayland/openbios/tree/318ccd08f0c857310af3736b1c604080dc4dc360) produced different executable code. The bundle patcher reproduces the inherited Radeon and Jaguar images from the verified UTM binary.
+
+The UTM loader matches the classicvirtio release ZIP member `ndrv/ndrvloader`. The ZIP SHA-256 was `f84d980dccb1686540f365d09b1ac658e44432da382fbf3e2236537d46c98757` for [classicvirtio revision fc401b4](https://github.com/elliotnunn/classicvirtio/tree/fc401b4c731027cb4068f3415def7fe79f6659da). The binary includes classicvirtio, Marco Paland’s printf, newlib routines and Retro68 runtime code. See the [download instructions](README.md#restore-the-mac-os-x-firmware) and [SHA-256 manifest](SHA256SUMS).

@@ -1,20 +1,27 @@
 # Firmware
 
-This table records the inherited firmware binaries and their stated origins. Checksums identify the files; they do not establish the exact corresponding source, build recipes or complete notices. Resolve those records before including these binaries in a public release.
+For MorphOS, use the [2018 OpenBIOS download](PROVENANCE.md#morphos-2018-openbios) and follow the [mac99 quickstart](../docs/MORPHOS-QUICKSTART.md).
 
-MorphOS uses a separate 2018 OpenBIOS file selected with `MORPHOS_FIRMWARE`;
-the UTM files below are not substitutes for its checked patch offsets. See
-[MorphOS setup](../docs/MORPHOS-QUICKSTART.md) for the required SHA-256 and inputs.
-Verified primary download/source records and the initial archive exclusions are
-documented in [PROVENANCE.md](PROVENANCE.md).
+## Restore the Mac OS X firmware
 
-| File | What it is | Origin | License |
-|---|---|---|---|
-| `vga/openbios-ppc` | OpenBIOS 1.1, the PowerPC Mac firmware. Used by `ppcosx install` and `ppcosx run --vga`. | Copied unmodified from UTM 4.7.5 (`UTM.app/Contents/Resources/qemu/openbios-ppc`). The OpenBIOS in `qemu/pc-bios` hangs before the display comes up on this machine setup. | GPL-2.0. Source: [openbios/openbios](https://github.com/openbios/openbios), as built by [UTM](https://github.com/utmapp/UTM) |
-| `radeon/openbios-ppc` | The same OpenBIOS with two changes: its built-in VGA table entry goes from QEMU VGA (1234:1111) to the Radeon 9700 PRO (1002:4E44), and the mac99 PCI host's `ranges` memory window grows from 256 MB to the 1 GB QEMU maps, so Leopard keeps the Radeon's VRAM and register BARs. | `src/patch-openbios.py vga/openbios-ppc radeon/openbios-ppc` (4-byte changes at 0x30678 and 0x2e144) | GPL-2.0 |
-| `jaguar/openbios-ppc` | The `radeon/` OpenBIOS with the VGA table entry set to the Radeon 9000 PRO (1002:4966) instead of the 9700 PRO, for Mac OS X 10.2 Jaguar (`ppcosx --jaguar`): Jaguar's ATIRadeon8500.kext matches 4966 and has no R300 driver. | `src/patch-openbios.py vga/openbios-ppc jaguar/openbios-ppc 4966` (it also makes the 1 GB `ranges` change above) | GPL-2.0 |
-| `*/ppc-ndrvloader` | Boot helper loaded at 0x4000000 and started by `init-program go`. | UTM 4.7.5; identical to `qemu/pc-bios/ppc-ndrvloader` | MIT. Source: [elliotnunn/classicvirtio](https://github.com/elliotnunn/classicvirtio) |
-| `radeon/qemu_vga_hwc.ndrv` | The QEMU VGA NDRV (the Mac OS display driver that runs the framebuffer before and alongside the ATI kext), patched for a hardware cursor and extra modes. | `python3 src/ndrv/build.py src/ndrv/qemu_vga.orig.ndrv radeon/qemu_vga_hwc.ndrv` gives a byte-identical file. | GPL-2.0. Base: [ozbenh/QemuMacDrivers](https://github.com/ozbenh/QemuMacDrivers). Patcher: [Spartan0285/PowerEmu](https://github.com/Spartan0285/PowerEmu) `ndrv/` |
+From the bundle root, download the VGA OpenBIOS and loader from the pinned UTM sources. These inputs match UTM 4.7.5. The commands verify them before generating either Radeon image.
+
+```sh
+(
+  set -e
+  cd firmware
+  mkdir -p vga radeon jaguar
+  curl -fL https://raw.githubusercontent.com/utmapp/qemu/39858ec7347616d5f513f72185873fa2e352d7de/pc-bios/openbios-ppc -o vga/openbios-ppc
+  curl -fL https://raw.githubusercontent.com/utmapp/UTM/048ca7498ea3a374439149d51739d94c5300bcda/patches/data/qemu-10.0.2-utm/pc-bios/ppc-ndrvloader -o vga/ppc-ndrvloader
+  grep '  vga/' SHA256SUMS | shasum -a 256 -c -
+  cp vga/ppc-ndrvloader radeon/ppc-ndrvloader
+  python3 src/patch-openbios.py vga/openbios-ppc radeon/openbios-ppc
+  python3 src/patch-openbios.py vga/openbios-ppc jaguar/openbios-ppc 4966
+  shasum -a 256 -c SHA256SUMS
+)
+```
+
+The Radeon 9700 and Jaguar patches change the PCI display ID and widen the mac99 PCI memory window. The loader also matches `ndrv/ndrvloader` in [Elliot Nunn’s classicvirtio release](https://github.com/elliotnunn/classicvirtio/releases/tag/latest). The hardware-cursor display driver is a separate file. Its [source and regeneration instructions](PROVENANCE.md#ndrv) apply to both launchers.
 
 ## What is *not* here, and why
 

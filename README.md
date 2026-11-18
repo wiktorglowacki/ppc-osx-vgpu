@@ -2,7 +2,7 @@
 
 This branch contains experimental MorphOS support for mac99 and the emulated Radeon 9700. Start with [MorphOS setup](docs/MORPHOS-QUICKSTART.md), including the user-supplied ISO and checked 2018 firmware. Public source reachability and a clean portable build remain [release prerequisites](docs/RELEASING.md); firmware is supplied separately and optional guest content is excluded from the initial artifacts.
 
-The Mac OS X instructions below are inherited upstream documentation. Their installer URLs select the upstream project, not this MorphOS fork.
+The Mac OS X instructions below are inherited upstream documentation. Their installer URLs select the upstream project. To use this checkout for Mac OS X, [restore its firmware](firmware/README.md#restore-the-mac-os-x-firmware) before booting.
 
 ## Upstream Mac OS X project
 
@@ -168,8 +168,7 @@ Leopard to 10.5.8 with the *10.5.8 Combo Update*.
 * **No Apple or ATI software is included.** You provide Mac OS X yourself.
 * The scripts and docs here are GPL-2.0-or-later ([LICENSE](LICENSE)).
   The QEMU fork is GPL-2.0, like QEMU.
-* The bundled [firmware](firmware/README.md) is free software (OpenBIOS,
-  QemuMacDrivers and classicvirtio).
+* [Firmware provenance](firmware/PROVENANCE.md) identifies the display driver and separately supplied boot firmware.
 
 ## Thanks
 

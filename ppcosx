@@ -596,7 +596,7 @@ cmd_doctor() {
     fi
     for f in "$FW_RADEON/openbios-ppc" "$FW_RADEON/ppc-ndrvloader" "$FW_RADEON/qemu_vga_hwc.ndrv" \
              "$FW_VGA/openbios-ppc" "$FW_VGA/ppc-ndrvloader"; do
-        [ -f "$f" ] || { bad "missing ${f#$REPO/}"; fail=1; }
+        [ -f "$f" ] || { bad "missing ${f#$REPO/} (see firmware/README.md)"; fail=1; }
     done
     (cd "$REPO/firmware" && sha1_check SHA1SUMS >/dev/null 2>&1) \
         && ok "firmware checksums" || { bad "firmware checksums do not match firmware/SHA1SUMS"; fail=1; }
@@ -920,7 +920,7 @@ cmd_run() {
 
     if [ "$MODE" = vga ]; then
         # UTM's "PowerPC G4" preset: QEMU VGA with the QEMU NDRV.  No 3D.
-        QARGS=(-L "$FW_VGA" -L "$QEMU_DATA" "${QARGS[@]}"
+        QARGS=(-bios "$FW_VGA/openbios-ppc" -L "$FW_VGA" -L "$QEMU_DATA" "${QARGS[@]}"
             -device loader,addr=0x4000000,file="$FW_VGA/ppc-ndrvloader"
             -prom-env "boot-command=$(model_forth)init-program go"
             -device VGA,edid=on -g "${RES}x32"
@@ -967,7 +967,7 @@ cmd_run() {
         local FW_BIOS="$FW_RADEON"
         [ "$CARD" = 9000 ] && FW_BIOS="$FW_JAGUAR"
         export QEMU_PPC_NDRV="$FW_RADEON/qemu_vga_hwc.ndrv"
-        QARGS=(-L "$FW_BIOS" -L "$QEMU_DATA" "${QARGS[@]}"
+        QARGS=(-bios "$FW_BIOS/openbios-ppc" -L "$FW_BIOS" -L "$QEMU_DATA" "${QARGS[@]}"
             -device loader,addr=0x4000000,file="$FW_RADEON/ppc-ndrvloader"
             -prom-env "boot-command=$boot"
             -global uni-north-pci.agp-capable=on
@@ -1009,6 +1009,7 @@ cmd_install() {
     done
     [ -n "$iso" ] || die "usage: $PROG install <Mac OS X install DVD: .iso .cdr .dmg .toast> [--size 40G]"
     [ -f "$iso" ] || die "no such file: $iso"
+    [ -f "$FW_VGA/openbios-ppc" ] || die "restore the Mac OS X firmware first (see firmware/README.md)"
 
     dvd_image "$iso"
     iso="$DVD_PATH"
@@ -1025,7 +1026,7 @@ cmd_install() {
     # Tiger installer is known to work with.  -no-reboot turns the
     # installer's final restart into a clean exit.
     build_common "$DISK" cd
-    QARGS=(-L "$FW_VGA" -L "$QEMU_DATA" "${QARGS[@]}"
+    QARGS=(-bios "$FW_VGA/openbios-ppc" -L "$FW_VGA" -L "$QEMU_DATA" "${QARGS[@]}"
         -device VGA,edid=on -g "${RES}x32"
         -drive "if=none,media=cdrom,id=cd,readonly=on,file=$iso"
         -device ide-cd,bus=ide.1,unit=0,drive=cd,bootindex=0
