@@ -106,7 +106,7 @@ python3 -m venv "$venv"
 
 (cd "$build" && env -u CFLAGS -u CXXFLAGS -u CPPFLAGS -u LDFLAGS "$qemu/configure" --python="$venv/bin/python3" \
     --target-list=ppc-softmmu --disable-docs --enable-sdl --enable-opengl \
-    --enable-gtk --enable-pa --enable-slirp --disable-werror -Doptimization=2 -Db_lto=false -Db_pgo=off)
+    --enable-gtk --enable-pa --enable-slirp --disable-werror -Ddtc:werror=false -Doptimization=2 -Db_lto=false -Db_pgo=off)
 ninja -C "$build" -j "$(nproc)" qemu-system-ppc qemu-img
 
 d="$stage/ppcosx-qemu"
