@@ -97,8 +97,8 @@ done
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
 
-# QEMU's configure wants a Python with distlib.
-venv="$build/pyvenv"
+# QEMU clears $build/pyvenv when it creates its own environment.
+venv="$build/bootstrap-venv"
 rm -rf "$build"
 mkdir -p "$build"
 python3 -m venv "$venv"
