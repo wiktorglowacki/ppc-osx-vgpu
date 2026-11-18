@@ -10,7 +10,7 @@
 # in .buildenv/pgo-workloads. See docs/DEVELOPING.md for the file format.
 #
 # The tarball is the prebuilt QEMU that "ppcosx setup" downloads on Linux.
-# Needs the build dependencies (see APT_DEPS in ppcosx) and the qemu/
+# Packaging needs patchelf, the build dependencies (see APT_DEPS in ppcosx) and the qemu/
 # submodule checked out.  The GitHub workflow .github/workflows/
 # qemu-linux.yml runs this on Ubuntu 24.04 (x86_64 and arm64) and
 # attaches the result to the release "qemu-<first 12 of the qemu commit>".
@@ -71,6 +71,7 @@ case "${1:-}" in ""|train)
     exit 0 ;;
 esac
 
+command -v patchelf >/dev/null || { echo "Install patchelf to build the Linux release archive." >&2; exit 1; }
 out=$(realpath -m "${1:?usage: $0 OUT.tar.xz}")
 repo=$(cd "$(dirname "$0")/.." && pwd)
 qemu="$repo/qemu"
@@ -112,6 +113,13 @@ ninja -C "$build" -j "$(nproc)" qemu-system-ppc qemu-img
 d="$stage/ppcosx-qemu"
 mkdir -p "$d/bin" "$d/share/pc-bios" "$d/licenses"
 cp "$build/qemu-system-ppc" "$build/qemu-img" "$d/bin/"
+for bin in "$d/bin/"*; do
+    # Clear the path string before removing its ELF tag from the release copy.
+    if [ -n "$(patchelf --print-rpath "$bin")" ]; then
+        patchelf --set-rpath '' "$bin"
+    fi
+    patchelf --remove-rpath "$bin"
+done
 strip "$d/bin/"*
 # Firmware is supplied separately; do not silently redistribute unqualified
 # OpenBIOS/NDRV binaries in this artifact.
