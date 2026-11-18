@@ -12,7 +12,7 @@
 # The tarball is the prebuilt QEMU that "ppcosx setup" downloads on Linux.
 # Packaging needs patchelf, the build dependencies (see APT_DEPS in ppcosx) and the qemu/
 # submodule checked out.  The GitHub workflow .github/workflows/
-# qemu-linux.yml runs this on Ubuntu 24.04 (x86_64 and arm64) and
+# qemu-linux.yml runs this on Ubuntu 24.04 x86_64 and
 # attaches the result to the release "qemu-<first 12 of the qemu commit>".
 #
 # Layout: ppcosx-qemu/{bin/qemu-system-ppc, bin/qemu-img, share/pc-bios/,

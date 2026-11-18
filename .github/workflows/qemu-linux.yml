@@ -21,15 +21,7 @@ permissions:
 jobs:
   build:
     if: github.ref == 'refs/heads/release/morphos-radeon'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-24.04
-            arch: x86_64
-          - runner: ubuntu-24.04-arm
-            arch: aarch64
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,11 +36,11 @@ jobs:
             libspirv-cross-c-shared-dev
 
       - name: Build
-        run: tools/build-linux-qemu.sh "ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz"
+        run: tools/build-linux-qemu.sh "ppcosx-qemu-linux-x86_64.tar.xz"
 
       - name: Smoke test
         run: |
-          tar -xJf "ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz"
+          tar -xJf "ppcosx-qemu-linux-x86_64.tar.xz"
           for bin in ppcosx-qemu/bin/*; do
             tags=$(readelf -dW "$bin")
             if grep -Eq '\((RPATH|RUNPATH)\)' <<< "$tags"; then
@@ -65,8 +57,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          name: ppcosx-qemu-linux-${{ matrix.arch }}
-          path: ppcosx-qemu-linux-${{ matrix.arch }}.tar.xz
+          name: ppcosx-qemu-linux-x86_64
+          path: ppcosx-qemu-linux-x86_64.tar.xz
           if-no-files-found: error
 
   publish:
@@ -82,9 +74,8 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
-          pattern: ppcosx-qemu-linux-*
-          merge-multiple: true
-      - name: Publish both architectures at the build commit
+          name: ppcosx-qemu-linux-x86_64
+      - name: Publish the x86_64 archive at the build commit
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -100,5 +91,5 @@ jobs:
           gh release view "$tag" >/dev/null 2>&1 ||
             gh release create "$tag" --verify-tag --latest=false \
               --title "Prebuilt QEMU for Linux ($tag)" \
-              --notes "qemu-system-ppc and qemu-img for ppcosx on Linux (Ubuntu 24.04 or newer, x86_64 and arm64), built from the pinned qemu/ commit."
-          gh release upload "$tag" ppcosx-qemu-linux-{x86_64,aarch64}.tar.xz --clobber
+              --notes "qemu-system-ppc and qemu-img for ppcosx on Linux (Ubuntu 24.04 or newer, x86_64), built from the pinned qemu/ commit."
+          gh release upload "$tag" ppcosx-qemu-linux-x86_64.tar.xz --clobber

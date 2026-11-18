@@ -84,9 +84,9 @@ Users get it with `git pull && git submodule update --init --depth 1 && ppcosx s
 
 Pushing a new pin to `release/morphos-radeon` starts the **Linux QEMU** workflow
 (`.github/workflows/qemu-linux.yml`). It runs `tools/build-linux-qemu.sh`
-on Ubuntu 24.04 (x86_64 and arm64). A manual run on that branch publishes
-both archives under `qemu-<first 12 characters of the qemu commit>`
-after both builds pass. The tag points to the bundle commit that was built.
+on Ubuntu 24.04 x86_64. A manual run on that branch publishes
+the archive under `qemu-<first 12 characters of the qemu commit>`
+after the build and smoke checks pass. The tag points to the bundle commit that was built.
 On Linux, `ppcosx setup` downloads the
 tarball matching the pinned commit into `prebuilt/`, checks that it runs
 (`ldd`, `--version`), and builds from source if there isn't one yet or
