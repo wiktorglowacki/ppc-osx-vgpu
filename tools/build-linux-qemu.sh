@@ -125,6 +125,7 @@ strip "$d/bin/"*
 # OpenBIOS/NDRV binaries in this artifact.
 cp -r "$qemu/pc-bios/keymaps" "$d/share/pc-bios/"
 cp "$qemu/COPYING" "$qemu/LICENSE" "$d/licenses/"
+cp "$repo/licenses/SPIRV-Cross-copyright" "$repo/licenses/Apache-2.0.txt" "$d/licenses/"
 sed '/^static const struct /,$d' "$qemu/hw/display/r300/r300_regnames.h" > "$d/licenses/Mesa-r300-notice.txt"
 cp "$repo/LICENSE" "$d/licenses/bundle-LICENSE"
 cp "$repo/tools/build-linux-qemu.sh" "$d/BUILD.sh"

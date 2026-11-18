@@ -1,0 +1,70 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SPIRV-Cross
+Source: https://github.com/KhronosGroup/SPIRV-Cross/
+
+Files: *
+Copyright: 2014-2020, The Khronos Group Inc.
+           2016-2021, Google Inc.
+           2015-2021, ARM Limited
+           2019-2021, Hans-Kristian Arntzen
+           2018-2021, Bradley Austin Davis
+           2016-2021, The Brenwill Workshop Ltd.
+           2016-2021, Robert Konrad
+License: Apache-2.0
+
+Files: CMakeLists.txt
+       main.cpp
+       spirv_cfg.*
+       spirv_common.hpp
+       spirv_cpp.*
+       spirv_cross.*
+       spirv_cross_c.*
+       spirv_cross_containers.hpp
+       spirv_cross_error_handling.hpp
+       spirv_cross_parsed_ir.*
+       spirv_cross_util.*
+       spirv_glsl.*
+       spirv_hlsl.*
+       spirv_msl.*
+       spirv_parser.*
+       spirv_reflect.*
+Copyright: 2016-2021, Google Inc.
+           2015-2021, Arm Limited
+           2016-2021, Robert Konrad
+           2016-2021, The Brenwill Workshop Ltd.
+           2018-2021, Bradley Austin Davis
+License: Apache-2.0 or Expat
+
+Files: GLSL.std.450.h
+       spirv.h
+       spirv.hpp
+Copyright: 2014-2020, The Khronos Group Inc.
+License: Expat
+
+Files: debian/*
+Copyright: 2021, Collabora, Ltd.
+License: Apache-2.0
+
+License: Apache-2.0
+ On Debian systems, the complete text of the Apache License version 2.0
+ can be found in "/usr/share/common-licenses/Apache-2.0".
+
+License: Expat
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and\/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
