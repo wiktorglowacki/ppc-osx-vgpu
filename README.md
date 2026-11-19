@@ -50,6 +50,10 @@ MORPHOS_NDRV=/path/to/qemu_vga_hwc.ndrv \
 
 You can boot the Live CD without a hard disk. To boot an existing installation, add `MORPHOS_HD=/path/to/system.img` and `MORPHOS_BOOT=hd` to the same command. Use a copy of your image for a first test.
 
+## Live CD networking
+
+The launcher enables user-mode networking by default on Linux and macOS. In the MorphOS Live CD’s Network preferences, open **Network Interfaces** and add or edit `eth0`. Select `sungem_eth.device`, set the unit to `0`, enable DHCP, and apply the settings.
+
 ## Apple Silicon
 
 Download the [native arm64 ZIP][mac-zip] for macOS 15 or later. Unpack it and install the listed runtime libraries with Homebrew.
