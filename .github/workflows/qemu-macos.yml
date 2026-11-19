@@ -1,0 +1,44 @@
+name: Apple Silicon QEMU
+
+on:
+  push:
+    branches: [release/morphos-radeon]
+    paths:
+      - qemu
+      - ppcosx
+      - licenses/**
+      - tools/morphos-run.sh
+      - tools/package-macos-qemu.sh
+      - docs/MACOS-ARCHIVE.md
+      - .github/workflows/qemu-macos.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.server_url == 'https://github.com' && github.ref == 'refs/heads/release/morphos-radeon'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Build and package
+        run: |
+          test "$(uname -m)" = arm64
+          ./ppcosx setup --build
+          ./tools/package-macos-qemu.sh
+      - name: Check extracted archive
+        run: |
+          cd "$(mktemp -d)"
+          tar -xzf "$GITHUB_WORKSPACE/ppcosx-qemu-macos-arm64.tar.gz"
+          cd ppcosx-qemu
+          shasum -a 256 -c SHA256SUMS
+          ./tools/morphos-run.sh --check
+          ./bin/qemu-img --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ppcosx-qemu-macos-arm64
+          path: ppcosx-qemu-macos-arm64.tar.gz
+          if-no-files-found: error

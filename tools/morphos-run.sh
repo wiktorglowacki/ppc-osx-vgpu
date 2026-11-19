@@ -89,8 +89,9 @@ if ! "$qemu" -device help 2>/dev/null | grep 'ati-radeon-9700' >/dev/null; then
     exit 1
 fi
 if [ "${1:-}" = --check ]; then
-    "$qemu" -display help | grep -E '^[[:space:]]*sdl([[:space:]]|$)' >/dev/null
-    echo "Radeon 9700 and SDL available in $qemu"
+    frontend=${MORPHOS_DISPLAY:-sdl}
+    "$qemu" -display help | awk -v name="$frontend" '$1 == name { found=1 } END { exit !found }'
+    echo "Radeon 9700 and $frontend available in $qemu"
     exit 0
 fi
 [ -f "$iso" ] || { echo "MorphOS ISO not found: $iso (set MORPHOS_ISO)." >&2; exit 1; }

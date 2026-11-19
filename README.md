@@ -6,9 +6,10 @@ QEMU’s contributors built the PowerPC emulator and the `mac99` machine that Mo
 
 This is a personal hobby project. I have no affiliation with the MorphOS Team. If you’ve never tried MorphOS, I encourage you to boot the Live CD in QEMU and spend a little time exploring Ambient. QEMU gives you a feel for the desktop, but it will never fully reproduce the responsiveness of a real PowerPC machine or the way its hardware behaves. If you enjoy MorphOS, I hope you’ll try it on supported hardware and buy a license from the team. [Supported hardware](https://www.morphos-team.net/hardware) · [How to register MorphOS](https://www.morphos-team.net/faq)
 
-**[Download for Linux x86_64 (ZIP)][linux-zip]** · [Apple Silicon](#apple-silicon) · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
+**[Download for Linux x86_64 (ZIP)][linux-zip]** · **[Download for Apple Silicon (ZIP)][mac-zip]** · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
 
 [linux-zip]: https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-linux/release%2Fmorphos-radeon/ppcosx-qemu-linux-x86_64.zip
+[mac-zip]: https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-macos/release%2Fmorphos-radeon/ppcosx-qemu-macos-arm64.zip
 
 [![GraphicBoards reporting the Radeon 9700, ATIRadeon driver and 256 MB of VRAM](docs/images/morphos-graphicboards.png)](docs/images/morphos-graphicboards-desktop.png)
 
@@ -48,6 +49,21 @@ MORPHOS_NDRV=/path/to/qemu_vga_hwc.ndrv \
 You can boot the Live CD without a hard disk. To boot an existing installation, add `MORPHOS_HD=/path/to/system.img` and `MORPHOS_BOOT=hd` to the same command. Use a copy of your image for a first test.
 
 ## Apple Silicon
+
+Download the [native arm64 ZIP][mac-zip] for macOS 15 or later. Unpack it and install the listed runtime libraries with Homebrew.
+
+```sh
+unzip ppcosx-qemu-macos-arm64.zip
+tar -xzf ppcosx-qemu-macos-arm64.tar.gz
+cd ppcosx-qemu
+shasum -a 256 -c SHA256SUMS
+xargs brew install < runtime-formulae.txt
+./tools/morphos-run.sh --check
+```
+
+Follow the [Mac launch instructions](docs/MACOS-ARCHIVE.md) for the Live CD, OpenBIOS and Radeon display driver.
+
+### Build from source on Apple Silicon
 
 Install Homebrew and the Xcode Command Line Tools, then build QEMU in a native Mac terminal (`uname -m` should print `arm64`).
 
