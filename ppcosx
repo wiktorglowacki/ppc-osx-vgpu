@@ -472,8 +472,8 @@ setup_mac() {
 
 setup_build() {
     local jobs
-    local display_flags=(--disable-sdl)
-    [ "$HOST_OS" = Linux ] && display_flags=(--enable-sdl --enable-opengl)
+    local host_flags=(--disable-sdl --disable-fuse)
+    [ "$HOST_OS" = Linux ] && host_flags=(--enable-sdl --enable-opengl)
     say "Fetching the QEMU source"
     if [ -d "$REPO/.git" ]; then
         git -C "$REPO" submodule update --init --depth 1 qemu \
@@ -508,7 +508,7 @@ setup_build() {
     mkdir -p "$QEMU_BUILD"
     if [ ! -f "$QEMU_BUILD/build.ninja" ] || [ ! -x "$QEMU_BUILD/qemu-system-ppc" ]; then
         (cd "$QEMU_BUILD" && ../configure --python="$venv/bin/python3" \
-            --target-list=ppc-softmmu --disable-docs "${display_flags[@]}" \
+            --target-list=ppc-softmmu --disable-docs "${host_flags[@]}" \
             --disable-werror -Ddtc:werror=false -Doptimization=2) \
             > "$QEMU_BUILD/ppcosx-configure.log" 2>&1 \
             || { tail -30 "$QEMU_BUILD/ppcosx-configure.log"
