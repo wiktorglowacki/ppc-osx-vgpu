@@ -54,6 +54,10 @@ You can boot the Live CD without a hard disk. To boot an existing installation, 
 
 The launcher enables user-mode networking by default on Linux and macOS. In the MorphOS Live CD’s Network preferences, open **Network Interfaces** and add or edit `eth0`. Select `sungem_eth.device`, set the unit to `0`, enable DHCP, and apply the settings.
 
+## Sound
+
+In MorphOS AHI preferences, select **AppleI2S: 16 bit stereo++** at **44.1 kHz**. If playback is quiet, open **Mixer**, select **I2S SoftCodec**, and set **Volume** to **100%**.
+
 ## Apple Silicon
 
 Download the [native arm64 ZIP][mac-zip] for macOS 15 or later. Unpack it and install the listed runtime libraries with Homebrew.
