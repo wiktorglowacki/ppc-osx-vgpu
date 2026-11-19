@@ -9,7 +9,9 @@ sha256sum -c SHA256SUMS
 ./tools/morphos-run.sh --check
 ```
 
-The build targets Ubuntu 24.04 x86_64. Use a working host Vulkan driver and an SDL/OpenGL desktop. The launcher uses Bash and Python 3. On Ubuntu the runtime libraries include `libglib2.0-0t64 libpixman-1-0 libslirp0 libgtk-3-0t64 libsdl2-2.0-0 libepoxy0 libpulse0 libvulkan1 libshaderc1 libspirv-cross-c-shared0`. Run `ldd bin/qemu-system-ppc` to identify missing shared libraries.
+Use an x86_64 Linux desktop with SDL/OpenGL, a working Vulkan driver, Bash and Python 3. CI builds the archive on Ubuntu 24.04. On Ubuntu the runtime libraries include `libglib2.0-0t64 libpixman-1-0 libslirp0 libgtk-3-0t64 libsdl2-2.0-0 libepoxy0 libpulse0 libvulkan1 libshaderc1 libspirv-cross-c-shared0`.
+
+On Fedora 44 the archive ran with additional shared libraries. From the extracted directory, run `ldd bin/qemu-system-ppc` to see which libraries your installation needs. If your distribution does not provide the required versions, follow the [native build instructions](https://github.com/wiktorglowacki/ppc-osx-vgpu/blob/release/morphos-radeon/docs/MORPHOS-QUICKSTART.md).
 
 Supply your MorphOS ISO, the checked 2018 OpenBIOS and the patched Radeon NDRV. The [firmware instructions](https://github.com/wiktorglowacki/ppc-osx-vgpu/blob/release/morphos-radeon/firmware/PROVENANCE.md) identify both firmware inputs and their checksums.
 

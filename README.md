@@ -1,183 +1,54 @@
-# MorphOS Radeon 9700 fork
+# MorphOS on QEMU with a Radeon 9700
 
-This branch contains experimental MorphOS support for mac99 and the emulated Radeon 9700. Start with [MorphOS setup](docs/MORPHOS-QUICKSTART.md), including the user-supplied ISO and checked 2018 firmware. Public source reachability and a clean portable build remain [release prerequisites](docs/RELEASING.md); firmware is supplied separately and optional guest content is excluded from the initial artifacts.
+Run MorphOS on a Linux PC with an emulated PowerPC G4, 2 GB of RAM and a Radeon 9700 with 256 MB of VRAM. MorphOS uses its own Radeon driver, and the host GPU renders 3D through Vulkan.
 
-The Mac OS X instructions below are inherited upstream documentation. Their installer URLs select the upstream project. To use this checkout for Mac OS X, [restore its firmware](firmware/README.md#restore-the-mac-os-x-firmware) before booting.
+QEMU’s contributors built the PowerPC emulator and the `mac99` machine that MorphOS boots on. linuxkid473 extended PowerEmu’s Radeon 9200 emulation to the Radeon 9700 and implemented the Vulkan renderer. I built on their work to get MorphOS’s own Radeon driver running, then tracked down the details that mattered in daily use, from framebuffer colours to the hardware cursor. [QEMU](https://www.qemu.org/) · [linuxkid473’s Radeon fork](https://github.com/linuxkid473/poweremu-qemu)
 
-## Upstream Mac OS X project
+This is a personal hobby project. I have no affiliation with the MorphOS Team. If you’ve never tried MorphOS, I encourage you to boot the Live CD in QEMU and spend a little time exploring Ambient. QEMU gives you a feel for the desktop, but it will never fully reproduce the responsiveness of a real PowerPC machine or the way its hardware behaves. If you enjoy MorphOS, I hope you’ll try it on supported hardware and buy a license from the team. [Supported hardware](https://www.morphos-team.net/hardware) · [How to register MorphOS](https://www.morphos-team.net/faq)
 
-**Run Mac OS X Tiger (the PowerPC version) on your Apple Silicon Mac or
-Linux PC, with working 3D graphics.**
+[Download the Linux build](https://github.com/wiktorglowacki/ppc-osx-vgpu/actions/workflows/qemu-linux.yml) · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
 
-Old PowerPC Macs and their software, back on a modern Mac: the Aqua desktop
-with Quartz Extreme, Core Image and OpenGL apps, accelerated by your Mac's
-own GPU.
+[![GraphicBoards reporting the Radeon 9700, ATIRadeon driver and 256 MB of VRAM](docs/images/morphos-graphicboards.png)](docs/images/morphos-graphicboards-desktop.png)
 
-![System Profiler in the emulated Mac reporting an ATI Radeon 9700 Pro, with Quartz Extreme and Core Image supported](docs/images/system-profiler.png)
+MorphOS identifies the card as **R300 [Radeon 9700/9700 PRO]** (PCI ID `1002:4e44`) with 256 MB of VRAM, driven by ATIRadeon 52.48. Select the screenshot to see the full Ambient desktop.
 
-## What makes it different
+![Doom 3 at 1600×1200, facing an enemy in a doorway](docs/images/morphos-doom3.png)
 
-Other PowerPC emulators give Tiger a simple "dumb" screen, so everything
-graphical is drawn slowly by the emulated CPU, and Quartz Extreme and Core
-Image are switched off.
+Doom 3 running fullscreen at 1600×1200 on MorphOS, captured in-game with the packaged emulator and an RTX 5090 Vulkan host.
 
-ppcosxkvm emulates a real graphics card that Tiger already knows: the
-**ATI Radeon 9700 PRO**. Tiger uses Apple's own driver for it, exactly as
-on a real Power Mac G4. Everything that driver asks the card to draw is
-handed to your GPU through Metal (on a Mac) or Vulkan (on Linux, and on a
-Mac with `--gpuvulkan`).
+## Boot the MorphOS Live CD
 
-* ✅ **Quartz Extreme**: windows and the Dock composited by the GPU
-* ✅ **Core Image**: reported as supported, with the programmable
-  shaders it needs
-* ✅ **OpenGL apps**: e.g. Chess, with depth, anti-aliasing and textures
-* ✅ **Easy to use**: one line to install, one word to start
+Use an **x86_64 Linux** desktop with SDL/OpenGL and a working Vulkan driver. The screenshots above were captured on Fedora 44. The prebuilt archive uses Ubuntu 24.04 libraries, so on Fedora you may need additional runtime libraries or a native build. [Linux runtime dependencies](docs/LINUX-ARCHIVE.md) · [Build from source](docs/MORPHOS-QUICKSTART.md)
 
-## What you need
+1. Sign in to GitHub, open a successful [Linux QEMU build](https://github.com/wiktorglowacki/ppc-osx-vgpu/actions/workflows/qemu-linux.yml), and download **ppcosx-qemu-linux-x86_64** under **Artifacts**.
+2. Download the **Live CD Image** from the [MorphOS team](https://www.morphos-team.net/downloads).
+3. Get the checked 2018 `openbios-qemu.elf` and the patched Radeon display driver, `qemu_vga_hwc.ndrv`. The [OpenBIOS instructions](firmware/PROVENANCE.md#morphos-2018-openbios) verify and extract the firmware. The [NDRV file](firmware/radeon/qemu_vga_hwc.ndrv) is in this repository.
 
-* 💻 A Mac with **Apple Silicon** (M1 or newer) and
-  **[Homebrew](https://brew.sh)** (the installer tells you if it's missing),
-  **or** an **Intel Mac** with **[MacPorts](https://www.macports.org/install.php)**
-  (Homebrew no longer supports Intel; see below),
-  **or** a Linux PC with a Vulkan GPU driver and `git` (Debian/Ubuntu,
-  Fedora or Arch: the installer gets the rest with `sudo`)
-* 💿 **Mac OS X Tiger (or Leopard) for PowerPC**, which you provide yourself. Either:
-  * a Tiger or Leopard **install DVD image** (`.iso`, `.dmg`, `.cdr` or `.toast`), or
-  * a Tiger **disk you already have** from another emulator, such as UTM,
-    VMware, VirtualBox or a raw image
-* 📦 About **25 GB** of free disk space
+From your download directory, unpack the emulator and check that it can load the Radeon device and SDL frontend.
 
-## Install
-
-Open **Terminal** and paste:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/linuxkid473/ppcosxkvm/main/install.sh | bash
+```sh
+unzip ppcosx-qemu-linux-x86_64.zip
+tar -xJf ppcosx-qemu-linux-x86_64.tar.xz
+cd ppcosx-qemu
+sha256sum -c SHA256SUMS
+./tools/morphos-run.sh --check
 ```
 
-That's it. It takes a few minutes the first time, and when it's done you
-have a new `ppcosx` command. (If Terminal says `ppcosx: command not found`,
-open a new Terminal window.)
+Replace the three example paths with your own files to boot the Live CD.
 
-## Set up Mac OS X
-
-Pick **one**:
-
-**A. Install Tiger from a DVD image**
-
-```bash
-ppcosx install ~/Downloads/MacOSX-Tiger.iso
+```sh
+MORPHOS_ISO=/path/to/morphos.iso \
+MORPHOS_FIRMWARE=/path/to/openbios-qemu.elf \
+MORPHOS_NDRV=/path/to/qemu_vga_hwc.ndrv \
+./tools/morphos-run.sh
 ```
 
-A window opens with the Tiger installer. First open **Utilities → Disk
-Utility**, erase the hard disk as *Mac OS Extended (Journaled)*, then
-install onto it. The [step-by-step guide](docs/GETTING-STARTED.md#3a-install-tiger-from-a-dvd-image)
-walks through every screen.
+You can boot the Live CD without a hard disk. To boot an existing installation, add `MORPHOS_HD=/path/to/system.img` and `MORPHOS_BOOT=hd` to the same command. Use a copy of your image for a first test.
 
-**B. Use a Tiger disk you already have**
+## Source and credits
 
-```bash
-ppcosx import ~/VMs/Tiger.vmdk        # also .qcow2 .vdi .vhd .img, or a UTM .utm
-```
+This repository contains the launcher. The [QEMU submodule](qemu) pins the exact emulator revision used for the binary. In both repositories, `release/morphos-radeon` carries the MorphOS changes and `upstream-clean` marks the cleaned upstream baseline.
 
-Your original file is copied and never changed.
+The launcher is adapted from [linuxkid473’s original bundle](https://github.com/linuxkid473/ppc-osx-vgpu). Thanks also to [Spartan0285 and the PowerEmu contributors](https://github.com/Spartan0285/poweremu-qemu) for the earlier Radeon emulation and to the [PowerEmu project](https://github.com/Spartan0285/PowerEmu) for the hardware cursor driver.
 
-## Start it
-
-```bash
-ppcosx
-```
-
-![The Tiger desktop running on the emulated Radeon 9700](docs/images/desktop.png)
-
-Other handy ways to start it:
-
-| Type this | To do this |
-|---|---|
-| `ppcosx` | Start Mac OS X with 3D graphics |
-| `ppcosx --vga` | **Safe mode**: simple graphics, if something looks wrong |
-| `ppcosx --attach-dvd ~/Discs/App.dmg` | Start with a CD/DVD image inserted, e.g. to install software |
-| `ppcosx --ram 2048` | Give it more memory (up to 2048 MB) |
-| `ppcosx --cpu-mhz 2500` | Change the CPU speed Mac OS X sees (default 2 GHz); it doesn't make it faster |
-| `ppcosx --model PowerBook6,8` | Change the Mac model Mac OS X sees (default: a PowerBook G4, so Aperture runs) |
-| `ppcosx --snapshot` | Try something risky: nothing you do is saved |
-| `ppcosx --no-audio` | Start without sound, if audio crashes or misbehaves on your Mac |
-| `ppcosx doctor` | Check that everything is set up correctly |
-| `ppcosx update` | Get the latest version |
-| `ppcosx help` | See every command and option |
-
-## Good to know
-
-* 🖱️ **Mouse stuck in the window?** Press **Ctrl + Option + G** (Linux:
-  **Ctrl + Alt + G**) to get it back.
-* 🎮 **Metal or Vulkan:** on an Apple Silicon Mac the Radeon renders with
-  Metal; add `--gpuvulkan` to use Vulkan (through MoltenVK) instead. Intel
-  Macs and Linux always use Vulkan: the Metal renderer needs an Apple GPU.
-* 🖥️ **Intel Macs** work, but more slowly: the AltiVec speed-ups are for
-  ARM processors, and the Radeon goes through Vulkan and MoltenVK.
-* ⏻ **Turning it off:** use **Apple menu → Shut Down** inside Mac OS X, like a real
-  Mac. Closing the window is like pulling the power plug.
-* 💾 **Save a restore point:** with the VM off, run
-  `ppcosx snapshot save my-backup`, and later
-  `ppcosx snapshot restore my-backup`.
-* 🐢 **Speed:** the whole PowerPC processor is emulated in software, so
-  expect roughly a G4-era Mac. The graphics are fast and run in parallel
-  with the emulated processor, like a real graphics card, and on Apple
-  Silicon the G4's AltiVec vector instructions (used by QuickTime and
-  Core Image) run as the host's NEON instructions. Heavy apps are still
-  bound by the emulated CPU.
-* 📁 **Your files** (the Mac OS X disk and settings) live in `~/.ppcosx/vm`.
-* ✅ **Is 3D really working?** In Mac OS X, open Apple menu → About This Mac →
-  More Info → Graphics/Displays. It should say **ATI Radeon 9700 Pro**, with
-  Quartz Extreme and Core Image *Supported*.
-
-## Something not working?
-
-1. Run `ppcosx doctor`. It checks the usual suspects.
-2. Try safe mode: `ppcosx --vga`.
-3. Look in the [troubleshooting guide](docs/TROUBLESHOOTING.md).
-4. Still stuck? [Open an issue](https://github.com/linuxkid473/ppcosxkvm/issues)
-   with the output of `ppcosx doctor`, your Tiger version, and a
-   screenshot.
-
-## Status
-
-Tested on **Mac OS X 10.4.11** and **10.5.8**. For the best results,
-update Tiger to 10.4.11 with Apple's *10.4.11 Combo Update (PPC)*, or
-Leopard to 10.5.8 with the *10.5.8 Combo Update*.
-
-| | |
-|---|---|
-| ✅ Works | Desktop with Quartz Extreme, Core Image, OpenGL (Chess, Quake III Arena), QuickTime video, Aperture 1.5, hardware cursor, keyboard and mouse |
-| 🟡 Should work, less tested | Installing from a DVD image, networking, sound, resolutions other than 1024×768, Linux hosts (built and set up on Ubuntu 24.04; not yet run on a Linux GPU), Intel Macs with MacPorts (not yet run on one) |
-| ✅ Jaguar | Mac OS X 10.2 with `ppcosx --jaguar` (an emulated Radeon 9000 PRO): Quartz Extreme and OpenGL (Chess); relative mouse, see [USAGE](docs/USAGE.md#jaguar-mac-os-x-102) |
-| ✅ Leopard | 10.5 to 10.5.8 with Quartz Extreme, Core Image and OpenGL (Chess); installs from the retail DVD image, or upgrades a Tiger disk |
-| ❌ Not yet | Multiple CPUs, video decode acceleration |
-
-## More documentation
-
-* 📘 [Getting started](docs/GETTING-STARTED.md): the full walkthrough
-* 🧰 [Using ppcosx](docs/USAGE.md): every command and option, moving files in and out
-* 🩺 [Troubleshooting](docs/TROUBLESHOOTING.md)
-* 🔌 [The ATI ROM](docs/ROM.md): optional, and why
-* 🔬 [How it works](docs/HOW-IT-WORKS.md): the emulated Radeon, the Metal/Vulkan translation, and how the emulated CPU is kept fast
-* 🛠️ [Developing](docs/DEVELOPING.md): building from source, debug switches, profiling, tests
-
-## Legal
-
-* **No Apple or ATI software is included.** You provide Mac OS X yourself.
-* The scripts and docs here are GPL-2.0-or-later ([LICENSE](LICENSE)).
-  The QEMU fork is GPL-2.0, like QEMU.
-* [Firmware provenance](firmware/PROVENANCE.md) identifies the display driver and separately supplied boot firmware.
-
-## Thanks
-
-Built on [QEMU](https://www.qemu.org) and
-[Spartan0285/poweremu-qemu](https://github.com/Spartan0285/poweremu-qemu),
-whose Radeon 9200 emulation this project extends to the Radeon 9700, with
-the hardware cursor driver from [PowerEmu](https://github.com/Spartan0285/PowerEmu).
-It also uses [OpenBIOS](https://github.com/openbios/openbios) as shipped by
-[UTM](https://github.com/utmapp/UTM),
-[QemuMacDrivers](https://github.com/ozbenh/QemuMacDrivers),
-[classicvirtio](https://github.com/elliotnunn/classicvirtio), and Mesa's
-R300 documentation.
+[Bundle license](LICENSE) · [Firmware and display driver credits](firmware/PROVENANCE.md)
