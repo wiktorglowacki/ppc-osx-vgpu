@@ -6,7 +6,9 @@ QEMU’s contributors built the PowerPC emulator and the `mac99` machine that Mo
 
 This is a personal hobby project. I have no affiliation with the MorphOS Team. If you’ve never tried MorphOS, I encourage you to boot the Live CD in QEMU and spend a little time exploring Ambient. QEMU gives you a feel for the desktop, but it will never fully reproduce the responsiveness of a real PowerPC machine or the way its hardware behaves. If you enjoy MorphOS, I hope you’ll try it on supported hardware and buy a license from the team. [Supported hardware](https://www.morphos-team.net/hardware) · [How to register MorphOS](https://www.morphos-team.net/faq)
 
-[Download the Linux build](https://github.com/wiktorglowacki/ppc-osx-vgpu/actions/workflows/qemu-linux.yml) · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
+**[Download for Linux x86_64 (ZIP)][linux-zip]** · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
+
+[linux-zip]: https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-linux/release%2Fmorphos-radeon/ppcosx-qemu-linux-x86_64.zip
 
 [![GraphicBoards reporting the Radeon 9700, ATIRadeon driver and 256 MB of VRAM](docs/images/morphos-graphicboards.png)](docs/images/morphos-graphicboards-desktop.png)
 
@@ -20,7 +22,7 @@ Doom 3 running fullscreen at 1600×1200 on MorphOS, captured in-game with the pa
 
 Use an **x86_64 Linux** desktop with SDL/OpenGL and a working Vulkan driver. The screenshots above were captured on Fedora 44. The prebuilt archive uses Ubuntu 24.04 libraries, so on Fedora you may need additional runtime libraries or a native build. [Linux runtime dependencies](docs/LINUX-ARCHIVE.md) · [Build from source](docs/MORPHOS-QUICKSTART.md)
 
-1. Sign in to GitHub, open a successful [Linux QEMU build](https://github.com/wiktorglowacki/ppc-osx-vgpu/actions/workflows/qemu-linux.yml), and download **ppcosx-qemu-linux-x86_64** under **Artifacts**.
+1. Download the [Linux x86_64 ZIP][linux-zip]. It contains QEMU and the Radeon launcher.
 2. Download the **Live CD Image** from the [MorphOS team](https://www.morphos-team.net/downloads).
 3. Get the checked 2018 `openbios-qemu.elf` and the patched Radeon display driver, `qemu_vga_hwc.ndrv`. The [OpenBIOS instructions](firmware/PROVENANCE.md#morphos-2018-openbios) verify and extract the firmware. The [NDRV file](firmware/radeon/qemu_vga_hwc.ndrv) is in this repository.
 
