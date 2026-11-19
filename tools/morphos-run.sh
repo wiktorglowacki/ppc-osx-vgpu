@@ -18,7 +18,13 @@ ndrv=${MORPHOS_NDRV:-$repo/firmware/radeon/qemu_vga_hwc.ndrv}
 # Per-instance generated firmware, extracted kernel and logs; disks stay explicit.
 vm="${MORPHOS_RUNTIME_DIR:-$repo/vm/morphos}"
 serial_log="$vm/boot-serial-$$.log"
-qemu=${PPCOSX_QEMU:-$repo/qemu/build/qemu-system-ppc}
+qemu=$repo/qemu/build/qemu-system-ppc
+qemu_data=$repo/prebuilt/share/pc-bios
+if [ -x "$repo/bin/qemu-system-ppc" ]; then
+    qemu=$repo/bin/qemu-system-ppc
+    qemu_data=$repo/share/pc-bios
+fi
+qemu=${PPCOSX_QEMU:-$qemu}
 vram_mb=${MORPHOS_VRAM_MB:-256}
 color_compat=${MORPHOS_COLOR_COMPAT:-on}
 # MORPHOS_PCI_BUS=pci.1 puts the card on the uni-north AGP bus instead of PCI.
@@ -59,9 +65,6 @@ case "$machine" in
     *) echo "MORPHOS_MACHINE must be mac99 or pegasos2." >&2; exit 2 ;;
 esac
 [ -x "$qemu" ] || { echo "Build the patched QEMU fork or set PPCOSX_QEMU to a patched build." >&2; exit 1; }
-[ -f "$iso" ] || { echo "MorphOS ISO not found: $iso (set MORPHOS_ISO)." >&2; exit 1; }
-[ -f "$firmware" ] || { echo "OpenBIOS not found: $firmware (set MORPHOS_FIRMWARE; see docs/MORPHOS-QUICKSTART.md)." >&2; exit 1; }
-[ -f "$ndrv" ] || { echo "NDRV not found: $ndrv (set MORPHOS_NDRV; see firmware/README.md)." >&2; exit 1; }
 # MORPHOS_CPUS=LIST runs QEMU on those host CPUs (taskset -c); unset, on the cores
 # with the largest L3 when L3 sizes differ; MORPHOS_CPUS= leaves it to the kernel.
 l3=(/sys/devices/system/cpu/cpu[0-9]*/cache/index3/size)
@@ -85,6 +88,14 @@ if ! "$qemu" -device help 2>/dev/null | grep 'ati-radeon-9700' >/dev/null; then
     echo "This QEMU cannot run the ati-radeon-9700 device (or has missing runtime libraries)." >&2
     exit 1
 fi
+if [ "${1:-}" = --check ]; then
+    "$qemu" -display help | grep -E '^[[:space:]]*sdl([[:space:]]|$)' >/dev/null
+    echo "Radeon 9700 and SDL available in $qemu"
+    exit 0
+fi
+[ -f "$iso" ] || { echo "MorphOS ISO not found: $iso (set MORPHOS_ISO)." >&2; exit 1; }
+[ -f "$firmware" ] || { echo "OpenBIOS not found: $firmware (set MORPHOS_FIRMWARE; see docs/MORPHOS-QUICKSTART.md)." >&2; exit 1; }
+[ -f "$ndrv" ] || { echo "NDRV not found: $ndrv (set MORPHOS_NDRV; see firmware/README.md)." >&2; exit 1; }
 mkdir -p "$vm"
 # MorphOS boots further with this checked 2018 OpenBIOS than with UTM's.
 python3 - "$firmware" "$vm/openbios-ppc" <<'PY'
@@ -291,7 +302,7 @@ if [ "$machine" = pegasos2 ]; then
         xorriso -osirrox on -indev "$iso" -extract /boot.img "$boot_img" >/dev/null 2>&1 || true
         [ -s "$boot_img" ] || { echo "Could not extract boot.img from $iso (xorriso)." >&2; exit 1; }
     fi
-    exec "${pin[@]}" "$qemu" "${display[@]}" "${tablet[@]}" -L "$repo/firmware/radeon" -L "$repo/prebuilt/share/pc-bios" \
+    exec "${pin[@]}" "$qemu" "${display[@]}" "${tablet[@]}" -L "$repo/firmware/radeon" -L "$qemu_data" \
         -machine pegasos2 ${cpu:+-cpu "$cpu"} -m "${MORPHOS_RAM_MB:-1024}" "${radeon[@]}" \
         -net none -kernel "$boot_img" -append "$boot_args" -cdrom "$iso" \
         -chardev "stdio,id=morphos-serial,logfile=$serial_log" \
@@ -311,7 +322,7 @@ case "${MORPHOS_IDE_ATA4:-off}" in
     *) echo "MORPHOS_IDE_ATA4 must be on or off." >&2; exit 2 ;;
 esac
 [ -n "$nvramrc" ] && prom=(-prom-env 'use-nvramrc?=true' -prom-env "nvramrc=$nvramrc")
-exec "${pin[@]}" "$qemu" "${display[@]}" "${tablet[@]}" -L "$repo/firmware/radeon" -L "$repo/prebuilt/share/pc-bios" \
+exec "${pin[@]}" "$qemu" "${display[@]}" "${tablet[@]}" -L "$repo/firmware/radeon" -L "$qemu_data" \
     -bios "$vm/openbios-ppc" -machine mac99,via=pmu -cpu "${cpu:-G4}" -m 2048 "${fastmem[@]}" "${radeon[@]}" \
     -g 1024x768x32 -net none "${cdrom[@]}" -boot "$boot_order" "${hd[@]}" \
     -prom-env "boot-device=$boot_dev" "${prom[@]}" \

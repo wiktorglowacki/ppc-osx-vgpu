@@ -9,14 +9,7 @@
 # Training boots a clone of vm/morphos/morphos-one.img for each guest command
 # in .buildenv/pgo-workloads. See docs/DEVELOPING.md for the file format.
 #
-# The tarball is the prebuilt QEMU that "ppcosx setup" downloads on Linux.
-# Packaging needs patchelf, the build dependencies (see APT_DEPS in ppcosx) and the qemu/
-# submodule checked out.  The GitHub workflow .github/workflows/
-# qemu-linux.yml runs this on Ubuntu 24.04 x86_64 and
-# attaches the result to the release "qemu-<first 12 of the qemu commit>".
-#
-# Layout: ppcosx-qemu/{bin/qemu-system-ppc, bin/qemu-img, share/pc-bios/,
-# VERSION (the actual qemu commit), licenses/, SOURCE.txt, BUILD.sh, SHA256SUMS}.
+# The Linux CI artifact contains the portable emulator and MorphOS launcher.
 # Distribution requires clean, matching bundle/QEMU commits and public HTTPS
 # source repositories (PPCOSX_SOURCE_URL/PPCOSX_BUNDLE_SOURCE_URL override origin).
 set -euo pipefail
@@ -119,7 +112,9 @@ python3 -m venv "$venv"
 ninja -C "$build" -j "$(nproc)" qemu-system-ppc qemu-img
 
 d="$stage/ppcosx-qemu"
-mkdir -p "$d/bin" "$d/share/pc-bios" "$d/licenses"
+mkdir -p "$d/bin" "$d/share/pc-bios" "$d/licenses" "$d/tools"
+cp "$repo/tools/morphos-run.sh" "$d/tools/"
+cp "$repo/docs/LINUX-ARCHIVE.md" "$d/README.md"
 cp "$build/qemu-system-ppc" "$build/qemu-img" "$d/bin/"
 for bin in "$d/bin/"*; do
     # Clear the path string before removing its ELF tag from the release copy.
