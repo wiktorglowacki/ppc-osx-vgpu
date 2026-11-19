@@ -19,7 +19,8 @@ permissions:
 jobs:
   build:
     if: github.server_url == 'https://github.com' && github.ref == 'refs/heads/release/morphos-radeon'
-    runs-on: macos-15
+    # Gitea needs an available runner to evaluate the job's skip condition.
+    runs-on: ${{ github.server_url == 'https://github.com' && 'macos-15' || vars.LINUX_X86_64_RUNNER || 'ubuntu-24.04' }}
     steps:
       - uses: actions/checkout@v4
         with:

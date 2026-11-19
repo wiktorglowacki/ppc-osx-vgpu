@@ -22,7 +22,7 @@ printf 'Bundle source commit: %s\nQEMU source commit: %s\n' "$(git rev-parse HEA
 # MoltenVK is discovered at runtime. Python is used to prepare OpenBIOS.
 printf '%s\n' molten-vk python > "$stage/formulae"
 for bin in "$d"/bin/*; do
-    lipo -verify_arch arm64 "$bin"
+    lipo "$bin" -verify_arch arm64
     strip -S "$bin"
     codesign --force --sign - "$bin"
     codesign --verify "$bin"
