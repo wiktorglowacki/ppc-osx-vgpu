@@ -1,6 +1,6 @@
 # MorphOS Radeon launcher for Linux x86_64
 
-Download the [Linux x86_64 ZIP](https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-linux/release%2Fmorphos-radeon/ppcosx-qemu-linux-x86_64.zip), then unpack and check it.
+Download the [Linux x86_64 ZIP](https://github.com/wiktorglowacki/ppc-osx-vgpu/releases/latest/download/ppcosx-qemu-linux-x86_64.zip), then unpack and check it.
 
 ```sh
 unzip ppcosx-qemu-linux-x86_64.zip

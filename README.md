@@ -8,8 +8,10 @@ This is a personal hobby project. I have no affiliation with the MorphOS Team. I
 
 **[Download for Linux x86_64 (ZIP)][linux-zip]** · **[Download for Apple Silicon (ZIP)][mac-zip]** · [Build from source](docs/MORPHOS-QUICKSTART.md) · [QEMU fork](https://github.com/wiktorglowacki/poweremu-qemu)
 
-[linux-zip]: https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-linux/release%2Fmorphos-radeon/ppcosx-qemu-linux-x86_64.zip
-[mac-zip]: https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-macos/release%2Fmorphos-radeon/ppcosx-qemu-macos-arm64.zip
+Nightly builds · [Linux x86_64](https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-linux/release%2Fmorphos-radeon/ppcosx-qemu-linux-x86_64.zip) · [Apple Silicon](https://nightly.link/wiktorglowacki/ppc-osx-vgpu/workflows/qemu-macos/release%2Fmorphos-radeon/ppcosx-qemu-macos-arm64.zip)
+
+[linux-zip]: https://github.com/wiktorglowacki/ppc-osx-vgpu/releases/latest/download/ppcosx-qemu-linux-x86_64.zip
+[mac-zip]: https://github.com/wiktorglowacki/ppc-osx-vgpu/releases/latest/download/ppcosx-qemu-macos-arm64.zip
 
 [![GraphicBoards reporting the Radeon 9700, ATIRadeon driver and 256 MB of VRAM](docs/images/morphos-graphicboards.png)](docs/images/morphos-graphicboards-desktop.png)
 
