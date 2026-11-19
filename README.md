@@ -39,7 +39,7 @@ sha256sum -c SHA256SUMS
 ./tools/morphos-run.sh --check
 ```
 
-Replace the three example paths with your own files to boot the Live CD.
+Replace the three example paths with your own files to boot the Live CD. You can boot it without a hard disk.
 
 ```sh
 MORPHOS_ISO=/path/to/morphos.iso \
@@ -48,7 +48,11 @@ MORPHOS_NDRV=/path/to/qemu_vga_hwc.ndrv \
 ./tools/morphos-run.sh
 ```
 
-You can boot the Live CD without a hard disk. To boot an existing installation, add `MORPHOS_HD=/path/to/system.img` and `MORPHOS_BOOT=hd` to the same command. Use a copy of your image for a first test.
+### First boot
+
+- Choose your language and click **OK** to reach Ambient. You can explore the desktop with **FirstFlight** open. **Installation or Update…** starts the installer. To open system preferences, right-click the desktop and choose **Settings → System…**.
+- On the Live CD, **Use** applies preferences for the current session. To keep network, sound, and screen settings across reboots, install MorphOS on a writable disk image and select **Save** in preferences.
+- Unregistered MorphOS slows down after 30 minutes. Reboot the guest to start a fresh session. [MorphOS FAQ](https://www.morphos-team.net/faq)
 
 ## Live CD networking
 
@@ -57,6 +61,19 @@ The launcher enables user-mode networking by default on Linux and macOS. In the 
 ## Sound
 
 In MorphOS AHI preferences, select **AppleI2S: 16 bit stereo++** at **44.1 kHz**. If playback is quiet, open **Mixer**, select **I2S SoftCodec**, and set **Volume** to **100%**.
+
+## Boot an installed disk image
+
+From inside the extracted `ppcosx-qemu` directory, use a copy of your installed disk image for the first boot. Keep the ISO at `../morphos-3.21.iso`. The launcher checks that this file exists even for a disk boot. Clear `MORPHOS_ISO` for this command so the CD stays detached.
+
+```sh
+env -u MORPHOS_ISO \
+  MORPHOS_HD=/path/to/system-copy.img \
+  MORPHOS_BOOT=hd \
+  MORPHOS_FIRMWARE=/path/to/openbios-qemu.elf \
+  MORPHOS_NDRV=/path/to/qemu_vga_hwc.ndrv \
+  ./tools/morphos-run.sh
+```
 
 ## Apple Silicon
 
